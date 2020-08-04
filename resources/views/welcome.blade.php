@@ -8,14 +8,11 @@
 
         <link href="{{ asset('/css/app.css') }}" rel="stylesheet">
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
-
     </head>
     <body>
-        <div id="app">
+        <v-app id="app">
             <example-component />
-        </div>
+        </v-app>
 
         <script src="{{ asset('/js/app.js') }}"></script>
     </body>
