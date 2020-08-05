@@ -2085,7 +2085,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      email: "",
+      password: ""
+    };
+  },
+  methods: {
+    login: function login() {
+      localStorage.setItem("token", "uygedf67dn9d238d3947");
+    }
+  }
+});
 
 /***/ }),
 
@@ -19765,7 +19784,7 @@ var render = function() {
                   [
                     _c(
                       "v-list-item-action",
-                      [_c("v-icon", [_vm._v("mdi -" + _vm._s(item.icon))])],
+                      [_c("v-icon", [_vm._v(_vm._s(item.icon))])],
                       1
                     ),
                     _vm._v(" "),
@@ -20027,7 +20046,14 @@ var render = function() {
                                       label: "Login",
                                       name: "login",
                                       "prepend-icon": "mdi-account",
-                                      type: "text"
+                                      type: "email"
+                                    },
+                                    model: {
+                                      value: _vm.email,
+                                      callback: function($$v) {
+                                        _vm.email = $$v
+                                      },
+                                      expression: "email"
                                     }
                                   }),
                                   _vm._v(" "),
@@ -20038,6 +20064,13 @@ var render = function() {
                                       name: "password",
                                       "prepend-icon": "mdi-lock",
                                       type: "password"
+                                    },
+                                    model: {
+                                      value: _vm.password,
+                                      callback: function($$v) {
+                                        _vm.password = $$v
+                                      },
+                                      expression: "password"
                                     }
                                   })
                                 ],
@@ -20052,9 +20085,14 @@ var render = function() {
                             [
                               _c("v-spacer"),
                               _vm._v(" "),
-                              _c("v-btn", { attrs: { color: "primary" } }, [
-                                _vm._v("Login")
-                              ])
+                              _c(
+                                "v-btn",
+                                {
+                                  attrs: { color: "primary" },
+                                  on: { click: _vm.login }
+                                },
+                                [_vm._v("Login")]
+                              )
                             ],
                             1
                           )
@@ -79058,12 +79096,12 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-app = new Vue({
+new Vue({
   el: "#app",
   router: _router__WEBPACK_IMPORTED_MODULE_1__["default"],
   vuetify: _vuetify__WEBPACK_IMPORTED_MODULE_0__["default"],
   components: {
-    'App': _components_AppComponent__WEBPACK_IMPORTED_MODULE_2__["default"]
+    App: _components_AppComponent__WEBPACK_IMPORTED_MODULE_2__["default"]
   }
 });
 
@@ -79348,7 +79386,14 @@ var routes = [{
 }, {
   path: "/admin",
   component: _components_AdminComponent__WEBPACK_IMPORTED_MODULE_3__["default"],
-  name: "Admin"
+  name: "Admin",
+  beforeEnter: function beforeEnter(to, from, next) {
+    if (localStorage.getItem("token")) {
+      next();
+    } else {
+      next("/login");
+    }
+  }
 }];
 /* harmony default export */ __webpack_exports__["default"] = (new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
   routes: routes

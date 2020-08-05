@@ -34,11 +34,11 @@ import App from "./components/AppComponent";
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-app = new Vue({
+new Vue({
     el: "#app",
     router,
     vuetify,
     components: {
-        'App': App
+        App: App
     }
 });
