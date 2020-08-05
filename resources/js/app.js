@@ -26,7 +26,7 @@ import router from "./router";
 //     require("./components/ExampleComponent.vue").default
 // );
 
-import Example from "./components/ExampleComponent";
+import App from "./components/AppComponent";
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -39,6 +39,6 @@ app = new Vue({
     router,
     vuetify,
     components: {
-        "example-component": Example
+        'App': App
     }
 });
