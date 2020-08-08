@@ -15,10 +15,12 @@ class UserController extends Controller
         $username        = $request->email;
         $password        = bcrypt($request->password);
         $user            = User::where('email', $username)->where('password', $password)->first();
-        $token           = Hash::make($request->password);
-        $user->api_token = $token;
-        $user->save();
-        
-        return $token;
+        if($user){
+            $token           = Hash::make($request->password);
+            $user->api_token = $token;
+            $user->save();
+            return response()->json(['token' => $token], 200);
+        }
+        return response()->json(['status' => 'Credential mismatch.'], 403);
     }
 }

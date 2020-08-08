@@ -10,6 +10,13 @@
                 <v-spacer></v-spacer>
               </v-toolbar>
               <v-card-text>
+                <v-progress-linear
+                  :active="loading"
+                  :indeterminate="loading"
+                  absolute
+                  top
+                  color="deep-purple accent-4"
+                ></v-progress-linear>
                 <v-form>
                   <v-text-field
                     label="Login"
@@ -34,6 +41,12 @@
                 <v-btn color="primary" @click="login">Login</v-btn>
               </v-card-actions>
             </v-card>
+            <v-snackbar v-model="snackbar">
+              {{ text }}
+              <template v-slot:action="{ attrs }">
+                <v-btn color="pink" text v-bind="attrs" @click="snackbar = false">Close</v-btn>
+              </template>
+            </v-snackbar>
           </v-col>
         </v-row>
       </v-container>
@@ -46,11 +59,45 @@ export default {
     return {
       email: "",
       password: "",
+      loading: false,
+      snackbar: false,
+      text: "",
     };
   },
   methods: {
     login: function () {
-      localStorage.setItem("token", "uygedf67dn9d238d3947");
+      // Add a request interceptor
+      axios.interceptors.request.use(
+        (config) => {
+          this.loading = true;
+          return config;
+        },
+        (error) => {
+          this.loading = false;
+          return Promise.reject(error);
+        }
+      );
+
+      // Add a response interceptor
+      axios.interceptors.response.use(
+        (response) => {
+          this.loading = false;
+          return response;
+        },
+        (error) => {
+          this.loading = false;
+          return Promise.reject(error);
+        }
+      );
+      axios
+        .post("/api/login", { email: this.email, password: this.password })
+        .then((res) => {
+          localStorage.setItem("token", res.data.token);
+        })
+        .catch((err) => {
+          this.text = err.response.data.status;
+          this.snackbar = true;
+        });
     },
   },
 };
