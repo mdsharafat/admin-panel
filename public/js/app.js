@@ -1972,9 +1972,17 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    source: String
+    source: String,
+    snackbar: false
   },
   data: function data() {
     return {
@@ -2015,6 +2023,17 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     this.$vuetify.theme.dark = true;
+    this.snackbar = true;
+  },
+  methods: {
+    logout: function logout() {
+      localStorage.removeItem("token");
+      this.$router.push("/login").then(function (res) {
+        return console.log("Logout Successfully");
+      })["catch"](function (err) {
+        return console.log(err);
+      });
+    }
   }
 });
 
@@ -2140,6 +2159,12 @@ __webpack_require__.r(__webpack_exports__);
         password: this.password
       }).then(function (res) {
         localStorage.setItem("token", res.data.token);
+
+        _this.$router.push("/admin").then(function (res) {
+          return console.log("LoggedIn Successfully");
+        })["catch"](function (err) {
+          return console.log(err);
+        });
       })["catch"](function (err) {
         _this.text = err.response.data.status;
         _this.snackbar = true;
@@ -19900,7 +19925,7 @@ var render = function() {
               _vm._v(" "),
               _c(
                 "v-list-item",
-                { attrs: { link: "" } },
+                { attrs: { link: "" }, on: { click: _vm.logout } },
                 [
                   _c(
                     "v-list-item-action",
@@ -19915,7 +19940,7 @@ var render = function() {
                   _c(
                     "v-list-item-title",
                     { staticClass: "grey--text text--darken-1" },
-                    [_vm._v("Manage Subscriptions")]
+                    [_vm._v("Logout")]
                   )
                 ],
                 1
@@ -19984,7 +20009,58 @@ var render = function() {
               _c(
                 "v-row",
                 { attrs: { justify: "center", align: "center" } },
-                [_c("v-col")],
+                [
+                  _c(
+                    "v-col",
+                    [
+                      _c(
+                        "v-snackbar",
+                        {
+                          scopedSlots: _vm._u([
+                            {
+                              key: "action",
+                              fn: function(ref) {
+                                var attrs = ref.attrs
+                                return [
+                                  _c(
+                                    "v-btn",
+                                    _vm._b(
+                                      {
+                                        attrs: { color: "red", text: "" },
+                                        on: {
+                                          click: function($event) {
+                                            _vm.snackbar = false
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    [_vm._v("Close")]
+                                  )
+                                ]
+                              }
+                            }
+                          ]),
+                          model: {
+                            value: _vm.snackbar,
+                            callback: function($$v) {
+                              _vm.snackbar = $$v
+                            },
+                            expression: "snackbar"
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n            You have logged in successfully.\n            "
+                          )
+                        ]
+                      )
+                    ],
+                    1
+                  )
+                ],
                 1
               )
             ],

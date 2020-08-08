@@ -25,11 +25,11 @@
           </v-list-item-action>
           <v-list-item-title class="grey--text text--darken-1">Browse Channels</v-list-item-title>
         </v-list-item>
-        <v-list-item link>
+        <v-list-item link @click="logout">
           <v-list-item-action>
             <v-icon color="grey darken-1">mdi-cog</v-icon>
           </v-list-item-action>
-          <v-list-item-title class="grey--text text--darken-1">Manage Subscriptions</v-list-item-title>
+          <v-list-item-title class="grey--text text--darken-1">Logout</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -56,7 +56,14 @@
     <v-main>
       <v-container class="fill-height">
         <v-row justify="center" align="center">
-          <v-col></v-col>
+          <v-col>
+            <v-snackbar v-model="snackbar">
+              You have logged in successfully.
+              <template v-slot:action="{ attrs }">
+                <v-btn color="red" text v-bind="attrs" @click="snackbar = false">Close</v-btn>
+              </template>
+            </v-snackbar>
+          </v-col>
         </v-row>
       </v-container>
     </v-main>
@@ -66,6 +73,7 @@
 export default {
   props: {
     source: String,
+    snackbar: false,
   },
   data: () => ({
     drawer: null,
@@ -86,6 +94,16 @@ export default {
   }),
   created() {
     this.$vuetify.theme.dark = true;
+    this.snackbar = true;
+  },
+  methods: {
+    logout: function () {
+      localStorage.removeItem("token");
+      this.$router
+        .push("/login")
+        .then((res) => console.log("Logout Successfully"))
+        .catch((err) => console.log(err));
+    },
   },
 };
 </script>

@@ -93,6 +93,10 @@ export default {
         .post("/api/login", { email: this.email, password: this.password })
         .then((res) => {
           localStorage.setItem("token", res.data.token);
+          this.$router
+            .push("/admin")
+            .then((res) => console.log("LoggedIn Successfully"))
+            .catch((err) => console.log(err));
         })
         .catch((err) => {
           this.text = err.response.data.status;
