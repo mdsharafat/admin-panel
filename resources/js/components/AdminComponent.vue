@@ -73,10 +73,10 @@
 export default {
   props: {
     source: String,
-    snackbar: false,
   },
   data: () => ({
     drawer: null,
+    snackbar: false,
     items: [
       { icon: "mdi-trending-up", text: "Most Popular" },
       { icon: "mdi-youtube-subscription", text: "Subscriptions" },
@@ -94,7 +94,10 @@ export default {
   }),
   created() {
     this.$vuetify.theme.dark = true;
-    this.snackbar = true;
+  },
+  mounted() {
+    this.snackbar = localStorage.getItem("loggedIn") ? true : false;
+    localStorage.removeItem("loggedIn");
   },
   methods: {
     logout: function () {

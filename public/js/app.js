@@ -1981,12 +1981,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    source: String,
-    snackbar: false
+    source: String
   },
   data: function data() {
     return {
       drawer: null,
+      snackbar: false,
       items: [{
         icon: "mdi-trending-up",
         text: "Most Popular"
@@ -2023,7 +2023,10 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {
     this.$vuetify.theme.dark = true;
-    this.snackbar = true;
+  },
+  mounted: function mounted() {
+    this.snackbar = localStorage.getItem("loggedIn") ? true : false;
+    localStorage.removeItem("loggedIn");
   },
   methods: {
     logout: function logout() {
@@ -2124,11 +2127,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      valid: true,
       email: "",
+      emailRules: [function (v) {
+        return !!v || "E-mail is required";
+      }, function (v) {
+        return /.+@.+\..+/.test(v) || "E-mail must be valid";
+      }],
       password: "",
+      passwordRules: [function (v) {
+        return !!v || "Password is required";
+      }],
       loading: false,
       snackbar: false,
       text: ""
@@ -2159,6 +2174,7 @@ __webpack_require__.r(__webpack_exports__);
         password: this.password
       }).then(function (res) {
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("loggedIn", true);
 
         _this.$router.push("/admin").then(function (res) {
           return console.log("LoggedIn Successfully");
@@ -20168,11 +20184,23 @@ var render = function() {
                               _vm._v(" "),
                               _c(
                                 "v-form",
+                                {
+                                  ref: "form",
+                                  model: {
+                                    value: _vm.valid,
+                                    callback: function($$v) {
+                                      _vm.valid = $$v
+                                    },
+                                    expression: "valid"
+                                  }
+                                },
                                 [
                                   _c("v-text-field", {
                                     attrs: {
                                       label: "Login",
                                       name: "login",
+                                      rules: _vm.emailRules,
+                                      required: "",
                                       "prepend-icon": "mdi-account",
                                       type: "email"
                                     },
@@ -20191,7 +20219,8 @@ var render = function() {
                                       label: "Password",
                                       name: "password",
                                       "prepend-icon": "mdi-lock",
-                                      type: "password"
+                                      type: "password",
+                                      required: ""
                                     },
                                     model: {
                                       value: _vm.password,
@@ -20216,7 +20245,10 @@ var render = function() {
                               _c(
                                 "v-btn",
                                 {
-                                  attrs: { color: "primary" },
+                                  attrs: {
+                                    color: "primary",
+                                    disabled: !_vm.valid
+                                  },
                                   on: { click: _vm.login }
                                 },
                                 [_vm._v("Login")]
@@ -20241,7 +20273,7 @@ var render = function() {
                                     "v-btn",
                                     _vm._b(
                                       {
-                                        attrs: { color: "pink", text: "" },
+                                        attrs: { color: "red", text: "" },
                                         on: {
                                           click: function($event) {
                                             _vm.snackbar = false
