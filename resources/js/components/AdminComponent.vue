@@ -2,7 +2,7 @@
   <v-app id="inspire">
     <v-navigation-drawer v-model="drawer" app clipped>
       <v-list dense>
-        <v-list-item v-for="item in items" :key="item.text" link>
+        <v-list-item v-for="item in items" :key="item.text" link :to="item.action">
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-item-action>
@@ -36,10 +36,13 @@
 
     <v-app-bar app clipped-left color="red" dense>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-icon class="mx-4" large>mdi-youtube</v-icon>
-      <v-toolbar-title class="mr-12 align-center">
-        <span class="title">Youtube</span>
-      </v-toolbar-title>
+      <v-btn text to="/admin" left>
+        <v-icon class="mx-4" large>mdi-laravel</v-icon>
+        <v-toolbar-title class="mr-12 align-center">
+          <span class="title">LARAVEL VUE ADMIN</span>
+        </v-toolbar-title>
+      </v-btn>
+
       <v-spacer></v-spacer>
       <v-row align="center" style="max-width: 650px">
         <v-text-field
@@ -54,7 +57,8 @@
     </v-app-bar>
 
     <v-main>
-      <v-container class="fill-height">
+      <v-container>
+        <router-view></router-view>
         <v-row justify="center" align="center">
           <v-col>
             <v-snackbar v-model="snackbar">
@@ -78,11 +82,19 @@ export default {
     drawer: null,
     snackbar: false,
     items: [
-      { icon: "mdi-trending-up", text: "Most Popular" },
-      { icon: "mdi-youtube-subscription", text: "Subscriptions" },
-      { icon: "mdi-history", text: "History" },
-      { icon: "mdi-playlist-play", text: "Playlists" },
-      { icon: "mdi-clock", text: "Watch Later" },
+      { icon: "mdi-account", text: "Users", action: "/admin/users" },
+      { icon: "mdi-post-outline", text: "Posts", action: "/admin/posts" },
+      {
+        icon: "mdi-circle-edit-outline",
+        text: "Pages",
+        action: "/admin/pages",
+      },
+      {
+        icon: "mdi-briefcase-edit-outline",
+        text: "Categories",
+        action: "/admin/categories",
+      },
+      { icon: "mdi-badge-account", text: "Roles", action: "/admin/roles" },
     ],
     items2: [
       { picture: 28, text: "Joseph" },
