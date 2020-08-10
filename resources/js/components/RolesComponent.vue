@@ -6,7 +6,7 @@
     :loading="loading"
     loading-text="Loading... Please wait"
     :headers="headers"
-    :items="desserts"
+    :items="roles"
     sort-by="calories"
   >
     <template v-slot:top>
@@ -54,7 +54,8 @@
         </v-dialog>
       </v-toolbar>
     </template>
-    <template v-slot:item.actions="{ item }">
+    <!-- <template v-slot:item.actions="{ item }"> -->
+    <template>
       <v-icon small class="mr-2" @click="editItem(item)">mdi-pencil</v-icon>
       <v-icon small @click="deleteItem(item)">mdi-delete</v-icon>
     </template>
@@ -70,32 +71,29 @@ export default {
     loading: false,
     headers: [
       {
-        text: "Dessert (100g serving)",
+        text: "SN",
         align: "start",
         sortable: false,
         value: "name",
       },
-      { text: "Calories", value: "calories" },
-      { text: "Fat (g)", value: "fat" },
-      { text: "Carbs (g)", value: "carbs" },
-      { text: "Protein (g)", value: "protein" },
+      { text: "Name", value: "name" },
+      { text: "Created At", value: "created_at" },
+      { text: "Updated At", value: "updated_at" },
       { text: "Actions", value: "actions", sortable: false },
     ],
-    desserts: [],
+    roles: [],
     editedIndex: -1,
     editedItem: {
       name: "",
       calories: 0,
       fat: 0,
       carbs: 0,
-      protein: 0,
     },
     defaultItem: {
       name: "",
       calories: 0,
       fat: 0,
       carbs: 0,
-      protein: 0,
     },
   }),
 
@@ -117,78 +115,31 @@ export default {
 
   methods: {
     initialize() {
-      this.desserts = [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
+      // Add a request interceptor
+      axios.interceptors.request.use(
+        (config) => {
+          this.loading = true;
+          return config;
         },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
+        (error) => {
+          this.loading = false;
+          return Promise.reject(error);
+        }
+      );
+
+      // Add a response interceptor
+      axios.interceptors.response.use(
+        (response) => {
+          this.loading = false;
+          return response;
         },
-        {
-          name: "Eclair",
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-        },
-      ];
+        (error) => {
+          this.loading = false;
+          return Promise.reject(error);
+        }
+      );
+      axios.get("/api/roles", {})
+      .then(res => this.roles = res.data.roles)
     },
 
     editItem(item) {
