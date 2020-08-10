@@ -62,6 +62,12 @@
     <template v-slot:no-data>
       <v-btn color="primary" @click="initialize">Reset</v-btn>
     </template>
+    <v-snackbar v-model="snackbar">
+      Record deleted successfully.
+      <template v-slot:action="{ attrs }">
+        <v-btn color="red" text v-bind="attrs" @click="snackbar = false">Close</v-btn>
+      </template>
+    </v-snackbar>
   </v-data-table>
 </template>
 <script>
@@ -69,6 +75,7 @@ export default {
   data: () => ({
     dialog: false,
     loading: false,
+    snackbar: false,
     headers: [
       {
         text: "SN",
@@ -155,8 +162,16 @@ export default {
 
     deleteItem(item) {
       const index = this.roles.indexOf(item);
-      confirm("Are you sure you want to delete this item?") &&
-        this.roles.splice(index, 1);
+      let decide = confirm("Are you sure you want to delete this item?");
+      if (decide) {
+        axios
+          .delete("/api/roles/" + item.id)
+          .then((res) => {
+            this.snackbar = true;
+            this.roles.splice(index, 1);
+          })
+          .catch((err) => console.log(err.response));
+      }
     },
 
     close() {
@@ -169,7 +184,15 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.roles[this.editedIndex], this.editedItem);
+        // console.log("FIRST " + this.editedIndex);
+        let currentIndex = this.editedIndex;
+        axios
+          .put("api/roles/" + this.editedItem.id, {
+            name: this.editedItem.name,
+          })
+          .then((res) => Object.assign(this.roles[currentIndex], res.data.role))
+          .catch((err) => console.log(err.response));
+        // Object.assign(this.roles[this.editedIndex], this.editedItem);
       } else {
         axios
           .post("/api/roles", { name: this.editedItem.name })

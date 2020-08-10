@@ -23,4 +23,9 @@ class UserController extends Controller
 
         return response()->json(['status' => 'Credential mismatch.'], 403);
     }
+
+    public function verify(Request $request)
+    {
+        return $request->user()->only('name', 'email');
+    }
 }
