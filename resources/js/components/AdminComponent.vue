@@ -21,9 +21,9 @@
         </v-list>
         <v-list-item class="mt-4" link>
           <v-list-item-action>
-            <v-icon color="grey darken-1">mdi-plus-circle-outline</v-icon>
+            <v-switch v-model="theme" class="ma-4"></v-switch>
           </v-list-item-action>
-          <v-list-item-title class="grey--text text--darken-1">Browse Channels</v-list-item-title>
+          <v-list-item-title class="grey--text text--darken-1">Switch Theme</v-list-item-title>
         </v-list-item>
         <v-list-item link @click="logout">
           <v-list-item-action>
@@ -34,7 +34,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app clipped-left color="red" dense>
+    <v-app-bar app clipped-left dense>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-btn text to="/admin" left>
         <v-icon class="mx-4" large>mdi-laravel</v-icon>
@@ -81,6 +81,7 @@ export default {
   data: () => ({
     drawer: null,
     snackbar: false,
+    theme: true,
     items: [
       { icon: "mdi-account", text: "Users", action: "/admin/users" },
       { icon: "mdi-post-outline", text: "Posts", action: "/admin/posts" },
@@ -110,6 +111,11 @@ export default {
   mounted() {
     this.snackbar = localStorage.getItem("loggedIn") ? true : false;
     localStorage.removeItem("loggedIn");
+  },
+  watch: {
+    theme: function (old, newval) {
+      this.$vuetify.theme.dark = old;
+    },
   },
   methods: {
     logout: function () {

@@ -1991,6 +1991,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       drawer: null,
       snackbar: false,
+      theme: true,
       items: [{
         icon: "mdi-account",
         text: "Users",
@@ -2036,6 +2037,11 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     this.snackbar = localStorage.getItem("loggedIn") ? true : false;
     localStorage.removeItem("loggedIn");
+  },
+  watch: {
+    theme: function theme(old, newval) {
+      this.$vuetify.theme.dark = old;
+    }
   },
   methods: {
     logout: function logout() {
@@ -20155,9 +20161,16 @@ var render = function() {
                   _c(
                     "v-list-item-action",
                     [
-                      _c("v-icon", { attrs: { color: "grey darken-1" } }, [
-                        _vm._v("mdi-plus-circle-outline")
-                      ])
+                      _c("v-switch", {
+                        staticClass: "ma-4",
+                        model: {
+                          value: _vm.theme,
+                          callback: function($$v) {
+                            _vm.theme = $$v
+                          },
+                          expression: "theme"
+                        }
+                      })
                     ],
                     1
                   ),
@@ -20165,7 +20178,7 @@ var render = function() {
                   _c(
                     "v-list-item-title",
                     { staticClass: "grey--text text--darken-1" },
-                    [_vm._v("Browse Channels")]
+                    [_vm._v("Switch Theme")]
                   )
                 ],
                 1
@@ -20202,7 +20215,7 @@ var render = function() {
       _vm._v(" "),
       _c(
         "v-app-bar",
-        { attrs: { app: "", "clipped-left": "", color: "red", dense: "" } },
+        { attrs: { app: "", "clipped-left": "", dense: "" } },
         [
           _c("v-app-bar-nav-icon", {
             on: {
