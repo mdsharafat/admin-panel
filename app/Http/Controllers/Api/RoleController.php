@@ -41,7 +41,9 @@ class RoleController extends Controller
      */
     public function show($id)
     {
-        //
+        $roles = Role::where('name', 'LIKE', "%$id%")->paginate();
+        \Log::debug($roles);
+        return response()->json(['roles' => $roles], 200);
     }
 
     /**

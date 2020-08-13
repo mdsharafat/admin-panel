@@ -13,10 +13,13 @@
     sort-by="calories"
     :footer-props="{
       itemsPerPageOptions: [5,10,15],
-      itemsPerPageText: 'Roles Per Page'
+      itemsPerPageText: 'Roles Per Page',
+      showCurrentPage: true,
+      showFirstLastPage: true
     }"
   >
     <template v-slot:top>
+      <v-text-field @input="searchIt" label="Search..."></v-text-field>
       <v-toolbar flat color="dark">
         <v-toolbar-title>ROLE MANAGEMENT SYSTEM</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
@@ -139,6 +142,20 @@ export default {
           this.$router.push("/login");
         });
     },
+    searchIt(e) {
+      if (e.length > 3) {
+        axios
+          .get(`/api/roles/${e}`)
+          .then((res) => (this.roles = res.data.roles))
+          .catch((err) => console.dir(err.response));
+      }
+      if (e.length <= 0) {
+        axios
+          .get(`/api/roles`)
+          .then((res) => (this.roles = res.data.roles))
+          .catch((err) => console.dir(err.response));
+      }
+    },
     initialize() {
       // Add a request interceptor
       axios.interceptors.request.use(
@@ -166,20 +183,20 @@ export default {
     },
 
     editItem(item) {
-      this.editedIndex = this.roles.indexOf(item);
+      this.editedIndex = this.roles.data.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      const index = this.roles.indexOf(item);
+      const index = this.roles.data.indexOf(item);
       let decide = confirm("Are you sure you want to delete this item?");
       if (decide) {
         axios
           .delete("/api/roles/" + item.id)
           .then((res) => {
             this.snackbar = true;
-            this.roles.splice(index, 1);
+            this.roles.data.splice(index, 1);
           })
           .catch((err) => console.log(err.response));
       }
@@ -195,19 +212,19 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        // console.log("FIRST " + this.editedIndex);
         let currentIndex = this.editedIndex;
         axios
           .put("api/roles/" + this.editedItem.id, {
             name: this.editedItem.name,
           })
-          .then((res) => Object.assign(this.roles[currentIndex], res.data.role))
+          .then((res) =>
+            Object.assign(this.roles.data[currentIndex], res.data.role)
+          )
           .catch((err) => console.log(err.response));
-        // Object.assign(this.roles[this.editedIndex], this.editedItem);
       } else {
         axios
           .post("/api/roles", { name: this.editedItem.name })
-          .then((res) => this.roles.push(res.data.role))
+          .then((res) => this.roles.data.push(res.data.role))
           .catch((err) => console.dir(err.response));
       }
       this.close();
