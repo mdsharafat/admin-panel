@@ -2287,6 +2287,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2342,31 +2349,39 @@ __webpack_require__.r(__webpack_exports__);
     this.initialize();
   },
   methods: {
-    initialize: function initialize() {
+    paginate: function paginate(e) {
       var _this = this;
 
-      // Add a request interceptor
-      axios.interceptors.request.use(function (config) {
-        _this.loading = true;
-        return config;
-      }, function (error) {
-        _this.loading = false;
-        return Promise.reject(error);
-      }); // Add a response interceptor
-
-      axios.interceptors.response.use(function (response) {
-        _this.loading = false;
-        return response;
-      }, function (error) {
-        _this.loading = false;
-        return Promise.reject(error);
-      });
-      axios.get("/api/roles", {}).then(function (res) {
+      axios.get("/api/roles?page=".concat(e.page), {
+        params: {
+          per_page: e.itemsPerPage
+        }
+      }).then(function (res) {
         return _this.roles = res.data.roles;
       })["catch"](function (err) {
         if (err.response.status == 401) localStorage.removeItem("token");
 
         _this.$router.push("/login");
+      });
+    },
+    initialize: function initialize() {
+      var _this2 = this;
+
+      // Add a request interceptor
+      axios.interceptors.request.use(function (config) {
+        _this2.loading = true;
+        return config;
+      }, function (error) {
+        _this2.loading = false;
+        return Promise.reject(error);
+      }); // Add a response interceptor
+
+      axios.interceptors.response.use(function (response) {
+        _this2.loading = false;
+        return response;
+      }, function (error) {
+        _this2.loading = false;
+        return Promise.reject(error);
       });
     },
     editItem: function editItem(item) {
@@ -2375,32 +2390,32 @@ __webpack_require__.r(__webpack_exports__);
       this.dialog = true;
     },
     deleteItem: function deleteItem(item) {
-      var _this2 = this;
+      var _this3 = this;
 
       var index = this.roles.indexOf(item);
       var decide = confirm("Are you sure you want to delete this item?");
 
       if (decide) {
         axios["delete"]("/api/roles/" + item.id).then(function (res) {
-          _this2.snackbar = true;
+          _this3.snackbar = true;
 
-          _this2.roles.splice(index, 1);
+          _this3.roles.splice(index, 1);
         })["catch"](function (err) {
           return console.log(err.response);
         });
       }
     },
     close: function close() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.dialog = false;
       this.$nextTick(function () {
-        _this3.editedItem = Object.assign({}, _this3.defaultItem);
-        _this3.editedIndex = -1;
+        _this4.editedItem = Object.assign({}, _this4.defaultItem);
+        _this4.editedIndex = -1;
       });
     },
     save: function save() {
-      var _this4 = this;
+      var _this5 = this;
 
       if (this.editedIndex > -1) {
         // console.log("FIRST " + this.editedIndex);
@@ -2408,7 +2423,7 @@ __webpack_require__.r(__webpack_exports__);
         axios.put("api/roles/" + this.editedItem.id, {
           name: this.editedItem.name
         }).then(function (res) {
-          return Object.assign(_this4.roles[currentIndex], res.data.role);
+          return Object.assign(_this5.roles[currentIndex], res.data.role);
         })["catch"](function (err) {
           return console.log(err.response);
         }); // Object.assign(this.roles[this.editedIndex], this.editedItem);
@@ -2416,7 +2431,7 @@ __webpack_require__.r(__webpack_exports__);
         axios.post("/api/roles", {
           name: this.editedItem.name
         }).then(function (res) {
-          return _this4.roles.push(res.data.role);
+          return _this5.roles.push(res.data.role);
         })["catch"](function (err) {
           return console.dir(err.response);
         });
@@ -20609,9 +20624,16 @@ var render = function() {
         loading: _vm.loading,
         "loading-text": "Loading... Please wait",
         headers: _vm.headers,
-        items: _vm.roles,
-        "sort-by": "calories"
+        items: _vm.roles.data,
+        "server-items-length": _vm.roles.total,
+        "items-per-page": 5,
+        "sort-by": "calories",
+        "footer-props": {
+          itemsPerPageOptions: [5, 10, 15],
+          itemsPerPageText: "Roles Per Page"
+        }
       },
+      on: { pagination: _vm.paginate },
       scopedSlots: _vm._u([
         {
           key: "top",

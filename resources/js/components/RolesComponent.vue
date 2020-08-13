@@ -6,8 +6,15 @@
     :loading="loading"
     loading-text="Loading... Please wait"
     :headers="headers"
-    :items="roles"
+    @pagination="paginate"
+    :items="roles.data"
+    :server-items-length="roles.total"
+    :items-per-page="5"
     sort-by="calories"
+    :footer-props="{
+      itemsPerPageOptions: [5,10,15],
+      itemsPerPageText: 'Roles Per Page'
+    }"
   >
     <template v-slot:top>
       <v-toolbar flat color="dark">
@@ -121,6 +128,17 @@ export default {
   },
 
   methods: {
+    paginate(e) {
+      axios
+        .get(`/api/roles?page=${e.page}`, {
+          params: { per_page: e.itemsPerPage },
+        })
+        .then((res) => (this.roles = res.data.roles))
+        .catch((err) => {
+          if (err.response.status == 401) localStorage.removeItem("token");
+          this.$router.push("/login");
+        });
+    },
     initialize() {
       // Add a request interceptor
       axios.interceptors.request.use(
@@ -145,13 +163,6 @@ export default {
           return Promise.reject(error);
         }
       );
-      axios
-        .get("/api/roles", {})
-        .then((res) => (this.roles = res.data.roles))
-        .catch((err) => {
-          if (err.response.status == 401) localStorage.removeItem("token");
-          this.$router.push("/login");
-        });
     },
 
     editItem(item) {
