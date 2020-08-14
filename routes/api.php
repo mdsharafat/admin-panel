@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['auth:api'], 'namespace' => 'Api'], function(){
     Route::resource('roles', 'RoleController');
     Route::get('/verify', 'UserController@verify');
+    Route::post('roles/delete-multiple-roles', 'RoleController@deleteAll');
 });
 
 Route::post('login', 'Api\UserController@login')->name('login');

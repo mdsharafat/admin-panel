@@ -2297,12 +2297,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       dialog: false,
       loading: false,
       snackbar: false,
+      selected: [],
       headers: [{
         text: "SN",
         align: "start",
@@ -2352,27 +2362,59 @@ __webpack_require__.r(__webpack_exports__);
     this.initialize();
   },
   methods: {
-    paginate: function paginate(e) {
+    selectAll: function selectAll(e) {
+      this.selected = [];
+
+      if (e.length > 0) {
+        this.selected = e.map(function (val) {
+          return val.id;
+        });
+      }
+    },
+    deleteAll: function deleteAll() {
       var _this = this;
+
+      var decide = confirm("Are you sure you want to delete all these items?");
+
+      if (decide) {
+        axios.post("/api/roles/delete-multiple-roles", {
+          roles: this.selected
+        }).then(function (res) {
+          _this.text = "Records deleted successfully";
+
+          _this.selected.map(function (val) {
+            var index = _this.roles.data.indexOf(val);
+
+            _this.roles.data.splice(index, 1);
+          });
+
+          _this.snackbar = true;
+        })["catch"](function (err) {
+          return console.log(err.response);
+        });
+      }
+    },
+    paginate: function paginate(e) {
+      var _this2 = this;
 
       axios.get("/api/roles?page=".concat(e.page), {
         params: {
           per_page: e.itemsPerPage
         }
       }).then(function (res) {
-        return _this.roles = res.data.roles;
+        return _this2.roles = res.data.roles;
       })["catch"](function (err) {
         if (err.response.status == 401) localStorage.removeItem("token");
 
-        _this.$router.push("/login");
+        _this2.$router.push("/login");
       });
     },
     searchIt: function searchIt(e) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (e.length > 3) {
         axios.get("/api/roles/".concat(e)).then(function (res) {
-          return _this2.roles = res.data.roles;
+          return _this3.roles = res.data.roles;
         })["catch"](function (err) {
           return console.dir(err.response);
         });
@@ -2380,29 +2422,29 @@ __webpack_require__.r(__webpack_exports__);
 
       if (e.length <= 0) {
         axios.get("/api/roles").then(function (res) {
-          return _this2.roles = res.data.roles;
+          return _this3.roles = res.data.roles;
         })["catch"](function (err) {
           return console.dir(err.response);
         });
       }
     },
     initialize: function initialize() {
-      var _this3 = this;
+      var _this4 = this;
 
       // Add a request interceptor
       axios.interceptors.request.use(function (config) {
-        _this3.loading = true;
+        _this4.loading = true;
         return config;
       }, function (error) {
-        _this3.loading = false;
+        _this4.loading = false;
         return Promise.reject(error);
       }); // Add a response interceptor
 
       axios.interceptors.response.use(function (response) {
-        _this3.loading = false;
+        _this4.loading = false;
         return response;
       }, function (error) {
-        _this3.loading = false;
+        _this4.loading = false;
         return Promise.reject(error);
       });
     },
@@ -2412,39 +2454,40 @@ __webpack_require__.r(__webpack_exports__);
       this.dialog = true;
     },
     deleteItem: function deleteItem(item) {
-      var _this4 = this;
+      var _this5 = this;
 
       var index = this.roles.data.indexOf(item);
       var decide = confirm("Are you sure you want to delete this item?");
 
       if (decide) {
         axios["delete"]("/api/roles/" + item.id).then(function (res) {
-          _this4.snackbar = true;
+          _this5.text = "Record deleted successfully";
+          _this5.snackbar = true;
 
-          _this4.roles.data.splice(index, 1);
+          _this5.roles.data.splice(index, 1);
         })["catch"](function (err) {
           return console.log(err.response);
         });
       }
     },
     close: function close() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.dialog = false;
       this.$nextTick(function () {
-        _this5.editedItem = Object.assign({}, _this5.defaultItem);
-        _this5.editedIndex = -1;
+        _this6.editedItem = Object.assign({}, _this6.defaultItem);
+        _this6.editedIndex = -1;
       });
     },
     save: function save() {
-      var _this6 = this;
+      var _this7 = this;
 
       if (this.editedIndex > -1) {
         var currentIndex = this.editedIndex;
         axios.put("api/roles/" + this.editedItem.id, {
           name: this.editedItem.name
         }).then(function (res) {
-          return Object.assign(_this6.roles.data[currentIndex], res.data.role);
+          return Object.assign(_this7.roles.data[currentIndex], res.data.role);
         })["catch"](function (err) {
           return console.log(err.response);
         });
@@ -2452,7 +2495,7 @@ __webpack_require__.r(__webpack_exports__);
         axios.post("/api/roles", {
           name: this.editedItem.name
         }).then(function (res) {
-          return _this6.roles.data.push(res.data.role);
+          return _this7.roles.data.push(res.data.role);
         })["catch"](function (err) {
           return console.dir(err.response);
         });
@@ -20648,6 +20691,7 @@ var render = function() {
         items: _vm.roles.data,
         "server-items-length": _vm.roles.total,
         "items-per-page": 5,
+        "show-select": "",
         "sort-by": "calories",
         "footer-props": {
           itemsPerPageOptions: [5, 10, 15],
@@ -20656,7 +20700,7 @@ var render = function() {
           showFirstLastPage: true
         }
       },
-      on: { pagination: _vm.paginate },
+      on: { pagination: _vm.paginate, input: _vm.selectAll },
       scopedSlots: _vm._u([
         {
           key: "top",
@@ -20706,6 +20750,21 @@ var render = function() {
                                   on
                                 ),
                                 [_vm._v("Add New Role")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "v-btn",
+                                _vm._b(
+                                  {
+                                    staticClass: "mb-2 mr-2",
+                                    attrs: { color: "primary", dark: "" },
+                                    on: { click: _vm.deleteAll }
+                                  },
+                                  "v-btn",
+                                  attrs,
+                                  false
+                                ),
+                                [_vm._v("Delete All")]
                               )
                             ]
                           }

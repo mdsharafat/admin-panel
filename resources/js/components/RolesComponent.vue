@@ -10,6 +10,8 @@
     :items="roles.data"
     :server-items-length="roles.total"
     :items-per-page="5"
+    show-select
+    @input="selectAll"
     sort-by="calories"
     :footer-props="{
       itemsPerPageOptions: [5,10,15],
@@ -27,6 +29,13 @@
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">Add New Role</v-btn>
+            <v-btn
+              color="primary"
+              dark
+              class="mb-2 mr-2"
+              v-bind="attrs"
+              @click="deleteAll"
+            >Delete All</v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -86,6 +95,7 @@ export default {
     dialog: false,
     loading: false,
     snackbar: false,
+    selected: [],
     headers: [
       {
         text: "SN",
@@ -131,6 +141,28 @@ export default {
   },
 
   methods: {
+    selectAll(e) {
+      this.selected = [];
+      if (e.length > 0) {
+        this.selected = e.map((val) => val.id);
+      }
+    },
+    deleteAll() {
+      let decide = confirm("Are you sure you want to delete all these items?");
+      if (decide) {
+        axios
+          .post("/api/roles/delete-multiple-roles", { roles: this.selected })
+          .then((res) => {
+            this.text = "Records deleted successfully";
+            this.selected.map((val) => {
+              const index = this.roles.data.indexOf(val);
+              this.roles.data.splice(index, 1);
+            });
+            this.snackbar = true;
+          })
+          .catch((err) => console.log(err.response));
+      }
+    },
     paginate(e) {
       axios
         .get(`/api/roles?page=${e.page}`, {
@@ -195,6 +227,7 @@ export default {
         axios
           .delete("/api/roles/" + item.id)
           .then((res) => {
+            this.text = "Record deleted successfully";
             this.snackbar = true;
             this.roles.data.splice(index, 1);
           })
