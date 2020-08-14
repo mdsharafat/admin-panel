@@ -120,6 +120,7 @@ export default {
   methods: {
     logout: function () {
       localStorage.removeItem("token");
+      localStorage.removeItem("loggedIn");
       this.$router
         .push("/login")
         .then((res) => console.log("Logout Successfully"))

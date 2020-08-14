@@ -103,10 +103,15 @@ export default {
         .then((res) => {
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("loggedIn", true);
-          this.$router
-            .push("/admin")
-            .then((res) => console.log("LoggedIn Successfully"))
-            .catch((err) => console.log(err));
+          if (res.data.isAdmin) {
+            this.$router
+              .push("/admin")
+              .then((res) => console.log("LoggedIn Successfully"))
+              .catch((err) => console.log(err));
+          } else {
+            this.text = "You need to log in as an administrator";
+            this.snackbar = true;
+          }
         })
         .catch((err) => {
           this.text = err.response.data.status;
@@ -116,4 +121,8 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+.fill-height {
+  background: #272727;
+}
+</style>

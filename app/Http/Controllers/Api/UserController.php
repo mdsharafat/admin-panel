@@ -18,7 +18,8 @@ class UserController extends Controller
             $token = Str::random(80);
             Auth::user()->api_token = $token;
             Auth::user()->save();
-            return response()->json(['token' => $token], 200);
+            $isAdmin = Auth::user()->isAdmin();
+            return response()->json(['token' => $token, 'isAdmin' => $isAdmin], 200);
         }
 
         return response()->json(['status' => 'Credential mismatch.'], 403);
